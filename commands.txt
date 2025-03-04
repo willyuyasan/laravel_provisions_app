@@ -1,0 +1,80 @@
+#Adding git origin
+git config --list
+git remote add origin https://github.com/willyuyasan/KLYM-Rotative-Line.git
+
+#Creating the project tree
+git subtree add --prefix rotative_line https://github.com/willyuyasan/rotative_line_v2.git master --squash
+
+#Pushing changes to the project child repo
+git subtree push --prefix rotative_line  https://github.com/willyuyasan/rotative_line_v2.git master
+
+
+
+Install following vs code extensions:
+1. Aura Theme
+2. Laravel Blade Snippet 
+3. Laravel Blade Spacer 
+4. Laravel Goto View 
+5. Laravel Snippets 
+6. Laravel Extra Intellisense
+7. PHP Intelephense
+8. PHP Namespace Resolver
+9. Better PHP Unit
+10. Vetur
+11. Tailwind CSS Intellisense
+12. Bracket Pair Colorizer
+13. Auto Close Tag
+14. Auto Complete Tag 
+15. Auto Rename Tag
+
+
+# Create a new project into the container
+cd /
+composer create-project --prefer-dist laravel/laravel app
+cd app
+php artisan --version
+
+composer install
+composer require laravel/octane spiral/roadrunner
+php artisan octane:install --server="swoole"
+
+# In development
+php artisan serve --host="0.0.0.0"
+php artisan octane:start --watch
+
+# In production
+php artisan octane:start --server="swoole" --host="0.0.0.0"
+
+# Then configure the .env file. Specially the DB connection
+
+
+
+# Restart the DB in case of redo the user
+php artisan migrate:fresh
+
+# Filament installation
+composer require filament/filament:"^3.2" -W --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip
+php artisan filament:install --panels
+php artisan make:filament-user
+
+php artisan make:filament-resource User --view --generate
+
+
+# Adjusting roles and permision see https://spatie.be/docs/laravel-permission/v6/installation-laravel
+composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan optimize:clear
+php artisan migrate
+
+php artisan make:model Role
+php artisan make:model Permission
+
+# Here run the seeder
+
+php artisan make:filament-resource Role --view --generate
+php artisan make:filament-resource Permission --view --generate
+
+#Creating models policies to control role access to the views
+php artisan make:policy UserPolicy --model=User
+php artisan make:policy RolePolicy --model=Role
+php artisan make:policy PermissionPolicy --model=Permission
