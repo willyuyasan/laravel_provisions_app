@@ -34,7 +34,10 @@ composer create-project --prefer-dist laravel/laravel app
 cd app
 php artisan --version
 
+# In case of already existin project
 composer install
+
+
 composer require laravel/octane spiral/roadrunner
 php artisan octane:install --server="swoole"
 
@@ -50,7 +53,7 @@ php artisan octane:start --server="swoole" --host="0.0.0.0"
 
 
 # Restart the DB in case of redo the user
-php artisan migrate:fresh
+php artisan migrate:fresh --seed
 
 # Filament installation
 composer require filament/filament:"^3.2" -W --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip
@@ -78,3 +81,20 @@ php artisan make:filament-resource Permission --view --generate
 php artisan make:policy UserPolicy --model=User
 php artisan make:policy RolePolicy --model=Role
 php artisan make:policy PermissionPolicy --model=Permission
+
+
+# Making the provinvoice model
+php artisan make:model Provinvoice
+php artisan make:filament-resource Provinvoice
+
+
+# Making a table widget
+php artisan make:filament-widget ProvisionSummary --table
+
+# Making a SQL view as a Model for complex widgets grouping an queries
+php artisan make:model ProvTranches
+php artisan make:migration ProvTranches #Here insert the view query
+php artisan migrate
+
+php artisan migrate:rollback --step=1
+php artisan migrate:rollback --batch=2 #see the migrations table
