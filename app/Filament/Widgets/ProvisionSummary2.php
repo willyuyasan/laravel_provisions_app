@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Support\Facades\FilamentColor;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
@@ -21,7 +22,8 @@ FilamentColor::register([
 
 class ProvisionSummary2 extends BaseWidget
 {
-    protected static ?string $model = ProvTranches::class;
+    protected static ?string $heading = 'Total Provision (Altura Mora)';
+    protected static ?int $sort = 4;
 
     public function table(Table $table): Table
     {
@@ -76,19 +78,31 @@ class ProvisionSummary2 extends BaseWidget
 
                 TextColumn::make('invoices')
                     ->grow(false)
-                    ->numeric(decimalPlaces: 0),
+                    ->numeric(decimalPlaces: 0)
+                    ->summarize(Sum::make()
+                        ->label('') 
+                        ->numeric(decimalPlaces: 0)
+                    ),
 
                 TextColumn::make('actual_debt')
                     ->grow(false)
-                    ->numeric(decimalPlaces: 0),
+                    ->numeric(decimalPlaces: 0)
+                    ->summarize(Sum::make()
+                        ->label('') 
+                        ->numeric(decimalPlaces: 0)
+                    ),
                 
                 TextColumn::make('provision')
                     ->grow(false)
-                    ->numeric(decimalPlaces: 0),
+                    ->numeric(decimalPlaces: 0)
+                    ->summarize(Sum::make()
+                        ->label('') 
+                        ->numeric(decimalPlaces: 0)
+                    ),
                 
-                //TextColumn::make('perc_provision')
-                //    ->grow(false)
-                //    ->numeric(decimalPlaces: 3),
+                TextColumn::make('perc_provision')
+                    ->grow(false)
+                    ->numeric(decimalPlaces: 3),
             ]);
     }
 }

@@ -22,7 +22,8 @@ FilamentColor::register([
 
 class ProvisionSummary extends BaseWidget
 {
-    protected static ?string $model = ProvTranches::class;
+    protected static ?string $heading = 'Total Provision (Productos)';
+    protected static ?int $sort = 3;
 
     public function table(Table $table): Table
     {
