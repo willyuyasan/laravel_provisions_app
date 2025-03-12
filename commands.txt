@@ -87,6 +87,8 @@ php artisan make:policy PermissionPolicy --model=Permission
 php artisan make:model Provinvoice
 php artisan make:filament-resource Provinvoice
 
+php artisan make:model Provcurve
+
 
 # Making a table widget
 php artisan make:filament-widget ProvisionSummary --table
@@ -95,6 +97,16 @@ php artisan make:filament-widget ProvisionSummary --table
 php artisan make:model ProvTranches
 php artisan make:migration ProvTranches #Here insert the view query
 php artisan migrate
+## see this for more details: https://tray2.se/posts/use-a-view-instead-of-a-complex-eloquent-query-in-your-laravel-application
 
 php artisan migrate:rollback --step=1
 php artisan migrate:rollback --batch=2 #see the migrations table
+
+
+# Making a chart widget
+php artisan make:filament-widget ProvisionCurve --chart
+
+
+# Making overviews
+php artisan make:filament-widget StatsOverview --stats-overview
+php artisan make:model ProcessInfo

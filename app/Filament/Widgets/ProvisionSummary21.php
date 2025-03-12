@@ -20,10 +20,10 @@ FilamentColor::register([
     'danger2' => Color::hex('#b0347f'), //purple
 ]);
 
-class ProvisionSummary2 extends BaseWidget
+class ProvisionSummary21 extends BaseWidget
 {
-    protected static ?string $heading = 'Total Provision (Altura Mora)';
-    protected static ?int $sort = 5;
+    protected static ?string $heading = 'Total Provision COVAL (Altura Mora)';
+    protected static ?int $sort = 6;
 
     public function table(Table $table): Table
     {
@@ -45,7 +45,7 @@ class ProvisionSummary2 extends BaseWidget
                         when T.age_range in ('180+') then 8
                     end as tranch_priority
                     "))
-                ->from(DB::raw('
+                ->from(DB::raw("
                         (
                         select
                         age_range
@@ -54,9 +54,11 @@ class ProvisionSummary2 extends BaseWidget
                         ,sum(actual_debt) as actual_debt
                         ,sum(provision) as provision
                         from provinvoices
+                        where
+                        curve_segment in ('COVAL')
                         group by
                         age_range
-                        ) as T'
+                        ) as T"
                         ))
                 ->orderBy('tranch_priority')
             )
