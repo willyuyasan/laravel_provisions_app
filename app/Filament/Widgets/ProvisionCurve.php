@@ -2,8 +2,9 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\ChartWidget;
 use App\Models\Provcurve;
+use App\Models\ProcessInfo;
+use Filament\Widgets\ChartWidget;
 
 class ProvisionCurve extends ChartWidget
 {
@@ -13,11 +14,12 @@ class ProvisionCurve extends ChartWidget
     protected function getData(): array
     {
         $chart_data = $this->getCurveProbs();
+        $x_labels = $this->getCurvexLabels();
 
         return [
             //
             'datasets' => $chart_data,
-            'labels' => [-60,-30,0,6,9,11,16,17,27,30,33,47,60,90,252,630]
+            'labels' => $x_labels
             ];
     }
 
@@ -50,10 +52,26 @@ class ProvisionCurve extends ChartWidget
 
         return $chart_data;
     }
+
+    private function getCurvexLabels():array {
+
+        $curve_x_labels = ProcessInfo::query()->where('description','curve_x_labels')->max('value');
+        $curve_x_labels = str_replace("{",'',$curve_x_labels);
+        $curve_x_labels = str_replace("}",'',$curve_x_labels);
+        $pieces = explode(",", $curve_x_labels);
+        $len_pieces = count($pieces);
+
+        $arr = [];
+        for ($i = 0; $i < $len_pieces; $i++) {
+            $arr[] = intval($pieces[$i]);
+        }
+
+        return $arr;
+    }
 }
 
 
-/** 
+/*
 //use App\Models\Provcurve;
 
 $curves=Provcurve::query()
@@ -74,4 +92,4 @@ foreach($curves as $curve){
 
     $chart_data[] = ['label' => $segment, 'data' => $probs, 'borderColor' => '#9BD0F5'];
 }
-    */
+*/

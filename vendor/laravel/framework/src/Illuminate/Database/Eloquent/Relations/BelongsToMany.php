@@ -868,8 +868,8 @@ class BelongsToMany extends Relation
     public function getResults()
     {
         return ! is_null($this->parent->{$this->parentKey})
-                ? $this->get()
-                : $this->related->newCollection();
+            ? $this->get()
+            : $this->related->newCollection();
     }
 
     /** @inheritDoc */
@@ -938,7 +938,7 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -1651,7 +1651,7 @@ class BelongsToMany extends Relation
         }
 
         return str_contains($column, '.')
-                    ? $column
-                    : $this->table.'.'.$column;
+            ? $column
+            : $this->table.'.'.$column;
     }
 }

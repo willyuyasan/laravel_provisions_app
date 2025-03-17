@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProvinvoiceResource\Pages;
 use Filament\Tables\Columns\TextColumn\TextColumnSize;
@@ -104,6 +105,7 @@ class ProvinvoiceResource extends Resource
 
                 SelectFilter::make('curve_segment')
                 ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -128,6 +130,14 @@ class ProvinvoiceResource extends Resource
             'index' => Pages\ListProvinvoices::route('/'),
             'create' => Pages\CreateProvinvoice::route('/create'),
             'edit' => Pages\EditProvinvoice::route('/{record}/edit'),
+        ];
+    }
+
+    // Registering the new widget
+    public static function getWidgets(): array
+    {
+        return [
+            ProvinvoiceResource\Widgets\ProvisionSummary::class,
         ];
     }
 }

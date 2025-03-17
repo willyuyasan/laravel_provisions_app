@@ -72,5 +72,9 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+
+    "post-update-cmd": [
+    "@php artisan filament:upgrade"
+    ]
 }
