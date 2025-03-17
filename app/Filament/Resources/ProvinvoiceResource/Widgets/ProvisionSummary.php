@@ -8,6 +8,7 @@ use App\Models\Provinvoice;
 use Illuminate\Support\Str;
 use Filament\Widgets\TableWidget;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -17,16 +18,19 @@ use App\Filament\Resources\ProvinvoiceResource\Pages\ListProvinvoices;
 class ProvisionSummary extends TableWidget
 {
 
+    protected $listeners = ['updateProvisionSumary' => '$refresh'];
+
+    protected static ?string $pollingInterval = null;
+
     protected int | string | array $columnSpan = 'full';
     
-    public string $country_code;
+    public string $queryse;
 
-    protected $listeners = ['updateProvisionSumary' => '$refresh'];
 
     public function table(Table $table): Table
     {
-        $country_code = $this->country_code;
-        $this->dispatch('updateProvisionSumary');
+        $queryse = session()->get('queryse');
+        error_log($queryse);
 
         return $table
             ->query(
@@ -56,8 +60,7 @@ class ProvisionSummary extends TableWidget
                         ,sum(actual_debt) as actual_debt
                         ,sum(provision) as provision
                         from provinvoices
-                        where
-                        country_code in ('{$country_code}')
+                        {$queryse}
                         group by
                         age_range
                         ) as T"
@@ -107,10 +110,9 @@ class ProvisionSummary extends TableWidget
                 TextColumn::make('perc_provision')
                     ->grow(false)
                     ->numeric(decimalPlaces: 3),
-            ]);
-
-            
-    
+            ])
+            //->poll('3s')
+            ; 
     }
 }
 

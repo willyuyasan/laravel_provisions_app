@@ -7,12 +7,15 @@ use App\Models\Provinvoice;
 use Illuminate\Support\Str;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\ProvinvoiceResource;
+use App\Filament\Resources\ProvinvoiceResource\Widgets\ProvisionSummary;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
 
 class ListProvinvoices extends ListRecords
 {
     protected static string $resource = ProvinvoiceResource::class;
     use ExposesTableToWidgets;
+
+    public $queryse;
     
 
     protected function getHeaderActions(): array
@@ -25,44 +28,54 @@ class ListProvinvoices extends ListRecords
     // For showing the widget into the resource
     protected function getHeaderWidgets(): array
     {
-        
-        $country_code = $this->table->getLivewire()->tableFilters['country_code']['value'];
-
-        //dd($country_code);
+        $queryse = $this->pass_queryfilters();
         $this->dispatch('updateProvisionSumary');
 
-        if (empty($country_code)){
-            $country_code = "CO','CL";
-        }
-
         return [
-            ProvinvoiceResource\Widgets\ProvisionSummary::make([
-                'country_code' => $country_code
-            ]),
+            ProvisionSummary::class
         ];
     }
 
-    public function updated($tableFilters)
+    public function updated($name)
     {
-        if ($tableFilters) {
-        $this->dispatch('updateProvisionSumary');
+        if (Str::of($name)->contains(['mountedTableAction', 'mountedTableBulkAction','tableFilters'])) {
+
+            $queryse = $this->pass_queryfilters();
+            $this->dispatch('updateProvisionSumary');
         }
+    }
+
+    public function pass_queryfilters(){
+
+        $country_code = $this->table->getLivewire()->tableFilters['country_code']['value'];
+        $product = $this->table->getLivewire()->tableFilters['product']['value'];
+        $curve_segment = $this->table->getLivewire()->tableFilters['curve_segment']['value'];
+
+        $queryse = 'where 1<2';
+        $queryse = $country_code ? "{$queryse} and country_code in ('{$country_code}')" : $queryse;
+        $queryse = $product ? "{$queryse} and product in ('{$product}')" : $queryse;
+        $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;
+
+        //error_log($queryse);
+
+        session()->put('queryse', $queryse);
+
+        return $queryse;
     }
 }
 
 /*
 
-$data = Provinvoice::get()->toArray();
-        $country_code = $data['country_code'];
-        $country_code = array_unique($country_code);
-        $country_code = var_dump(implode(",", $country_code)); 
+return [
+            ProvinvoiceResource\Widgets\ProvisionSummary::make([
+                'country_code' => $country_code
+            ]),
+        ];
 
-
-use App\Models\Provinvoice;
-$data = Provinvoice::get()->toArray();
-
-public function updateTableFilters(string $filter): void 
-    { 
-        $this->tableFilters[$filter]['isActive'] = true; 
-    } 
+        if (empty($country_code)){
+            $country_code = "CO','CL";
+        }
+        else{
+            $country_code = $country_code;
+        }
 */
