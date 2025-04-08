@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use Exception;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Models\Provinvoice;
@@ -29,7 +30,8 @@ class ProvisionSummary extends BaseWidget
 
     protected $listeners = ['updateProvisionSumary' => '$refresh'];
     protected static ?string $pollingInterval = null;
-    public string $queryse;
+    protected static bool $isLazy = false;
+    //public string $queryse;
 
     public function table(Table $table): Table
     {
@@ -95,11 +97,27 @@ class ProvisionSummary extends BaseWidget
 
                 SelectFilter::make('curve_segment')
                 ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
+
             ]);
     }
 
-    public function updated($name)
+    public function resetTableFiltersForm(): void
     {
+        error_log('resetTableFiltersForm');
+        $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary');
+    }
+
+    public function dehydrate(): void
+    {
+        error_log('dehydrate');
+        $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary');
+    }
+
+    public function updated(): void
+    {
+        error_log('updated');
         $queryse = $this->pass_queryfilters();
         $this->dispatch('updateProvisionSumary');
     }
@@ -126,4 +144,6 @@ class ProvisionSummary extends BaseWidget
 
         return $queryse;
     }
+
+    
 }
