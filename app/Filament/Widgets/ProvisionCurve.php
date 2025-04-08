@@ -42,8 +42,9 @@ class ProvisionCurve extends ChartWidget
 
             $segment = $curve['product'];
             $probs = [];
+            $lencurve = count($curve) - 12;
 
-            for ($i = 0; $i <= 15; $i++) {
+            for ($i = 0; $i <= $lencurve; $i++) {
                 $probs[] = $curve[$i];
             }
 
