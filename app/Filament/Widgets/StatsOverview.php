@@ -20,24 +20,16 @@ class StatsOverview extends BaseWidget
         return [
             //
             Stat::make('Fecha de Balance:', $prov_info['balance_date'])
-                ->description("Maximo numero de dias estimado: {$end_curve_days} .\n 
-                    Presione aqui para ver los archivos!")
+                ->description("Presione aqui para ver los archivos!")
                 ->descriptionIcon('heroicon-m-link')
                 ->color('success')
                 ->extraAttributes([
                     'class' => 'cursor-pointer',
                 ])
                 ->url($prov_info['url_provisions_storage']),
+                //->url('//login.microsoftonline.com'),
 
-            Stat::make('Total Facturas', $prov_info['invoices'])
-                ->description('Facturas con saldo pendiente a la fecha')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->color('success'),
-
-            Stat::make('Total Provision', $prov_info['provision'])
-                ->description("{$pp_prov} % of provision")
-                ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color('danger'),
+            Stat::make('Maximo numero de dias estimado:', $end_curve_days),
         ];
     }
 
@@ -45,7 +37,11 @@ class StatsOverview extends BaseWidget
     {
         $balance_date = ProcessInfo::query()->where('description','balance_date')->max('value');
         $end_curve_days = ProcessInfo::query()->where('description','end_curve_days')->max('value');
+
         $url_provisions_storage = ProcessInfo::query()->where('description','url_provisions_storage')->max('value');
+        //$url_provisions_storage = str_replace("https:",'',$url_provisions_storage);
+        //$url_provisions_storage = str_replace("http:",'',$url_provisions_storage);
+
         $invoices = number_format(Provinvoice::query()->count(), 0);
         $provision = number_format(Provinvoice::query()->sum('provision'), 0);
 
@@ -67,7 +63,7 @@ class StatsOverview extends BaseWidget
     }
 
     protected function getColumns(): int {
-        return 3;
+        return 2;
     }
 }
 

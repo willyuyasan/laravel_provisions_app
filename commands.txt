@@ -50,10 +50,12 @@ php artisan config:clear
 
 composer require laravel/octane spiral/roadrunner
 php artisan octane:install --server="swoole"
+npm install chokidar
+
 
 # In development
 php artisan serve --host="0.0.0.0"
-php artisan octane:start --watch
+php artisan octane:start --watch --host="0.0.0.0"
 
 # In production
 php artisan octane:start --server="swoole" --host="0.0.0.0"

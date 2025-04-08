@@ -5,11 +5,13 @@ namespace App\Filament\Widgets;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Models\Provinvoice;
+use Illuminate\Support\Str;
 use App\Models\ProvTranches;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -25,29 +27,29 @@ class ProvisionSummary extends BaseWidget
     protected static ?string $heading = 'Total Provision (Productos)';
     protected static ?int $sort = 3;
 
+    protected $listeners = ['updateProvisionSumary' => '$refresh'];
+    protected static ?string $pollingInterval = null;
+    public string $queryse;
+
     public function table(Table $table): Table
     {
+        $queryse = $this->get_session_values();
+        error_log($queryse);
+
         return $table
             ->query(
                 Provinvoice::query()
-                ->select(DB::raw("
-                    *
-                    ,provision/actual_debt as perc_provision
-                    "))
-                ->from(DB::raw('
-                        (
-                        select
-                        product
-                        ,min(id) as id
-                        ,count(*) as invoices
-                        ,sum(actual_debt) as actual_debt
-                        ,sum(provision) as provision
-                        from provinvoices
-                        group by
-                        product
-                        ) as T'
-                        ))
+                ->select(DB::raw('
+                    product
+                    ,min(id) as id
+                    ,count(*) as invoices
+                    ,sum(actual_debt) as actual_debt
+                    ,sum(provision) as provision
+                    '
+                    ))
+                ->groupBy('product')
                 ->orderBy('provision','desc') //mandatory for allow laravel to execute the query
+                ->whereRaw("{$queryse}")
             )
             ->columns([
                 // ...
@@ -79,8 +81,49 @@ class ProvisionSummary extends BaseWidget
                     ),
                 
                 TextColumn::make('perc_provision')
+                    ->getStateUsing(function(Model $record) {
+                        return $record->provision / $record->actual_debt;
+                    })
                     ->grow(false)
                     ->numeric(decimalPlaces: 3),
+                    
+            ])
+            ->filters([
+                //
+                SelectFilter::make('country_code')
+                ->options(fn (): array => Provinvoice::query()->pluck('country_code','country_code')->all()),
+
+                SelectFilter::make('curve_segment')
+                ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
             ]);
+    }
+
+    public function updated($name)
+    {
+        $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary');
+    }
+
+    public function pass_queryfilters(){
+
+        $country_code = $this->table->getLivewire()->tableFilters['country_code']['value'];
+        $curve_segment = $this->table->getLivewire()->tableFilters['curve_segment']['value'];
+
+        $queryse = '1<2';
+        $queryse = $country_code ? "{$queryse} and country_code in ('{$country_code}')" : $queryse;
+        $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;
+
+        session()->put('queryse', $queryse);
+
+        return $queryse;
+    }
+
+    public function get_session_values(){
+
+        $queryse = session()->get('queryse');
+
+        $queryse = $queryse ? $queryse : '1<2';
+
+        return $queryse;
     }
 }

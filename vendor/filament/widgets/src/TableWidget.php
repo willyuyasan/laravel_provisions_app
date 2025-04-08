@@ -58,4 +58,11 @@ class TableWidget extends Widget implements Actions\Contracts\HasActions, Forms\
                     ->title(),
             );
     }
+
+    protected static bool $collapsible = false;
+
+    public function isCollapsible() : bool
+    {
+        return static::$collapsible;
+    }
 }

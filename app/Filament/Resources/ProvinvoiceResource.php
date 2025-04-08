@@ -8,11 +8,12 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Provinvoice;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProvinvoiceResource\Pages;
 use Filament\Tables\Columns\TextColumn\TextColumnSize;
@@ -104,7 +105,9 @@ class ProvinvoiceResource extends Resource
                 ->options(fn (): array => Provinvoice::query()->pluck('product','product')->all()),
 
                 SelectFilter::make('curve_segment')
-                ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
+                ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all())
+                ->default(null),
+                
 
             ])
             ->actions([

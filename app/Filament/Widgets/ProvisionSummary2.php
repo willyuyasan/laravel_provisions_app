@@ -25,41 +25,32 @@ class ProvisionSummary2 extends BaseWidget
     protected static ?string $heading = 'Total Provision (Altura Mora)';
     protected static ?int $sort = 5;
 
+    protected $listeners = ['updateProvisionSumary' => '$refresh'];
+    protected static ?string $pollingInterval = null;
+    public string $queryse;
+
     public function table(Table $table): Table
     {
+        $queryse = $this->get_session_values();
+        error_log($queryse);
+
         return $table
             ->query(
-                Provinvoice::query()
-                ->select(DB::raw("
-                    *
-                    ,provision/actual_debt as perc_provision
+                ProvTranches::query()
+                ->select(DB::raw('
+                    age_range
+                    ,min(id) as id
+                    ,min(tranch_priority) as tranch_priority
+                    ,sum(invoices) as invoices
+                    ,sum(actual_debt) as actual_debt
+                    ,sum(provision) as provision
+                    '
+                    ))
+                ->groupBy('age_range')
+                ->orderBy('tranch_priority','asc') //mandatory for allow laravel to execute the query
+                ->whereRaw("{$queryse}")
+                )
 
-                    ,case
-                        when T.age_range in ('VIGENTE') then 1
-                        when T.age_range in ('1-15') then 2
-                        when T.age_range in ('16-30') then 3
-                        when T.age_range in ('31-60') then 4
-                        when T.age_range in ('61-90') then 5
-                        when T.age_range in ('91-120') then 6
-                        when T.age_range in ('121-180') then 7
-                        when T.age_range in ('180+') then 8
-                    end as tranch_priority
-                    "))
-                ->from(DB::raw('
-                        (
-                        select
-                        age_range
-                        ,min(id) as id
-                        ,count(*) as invoices
-                        ,sum(actual_debt) as actual_debt
-                        ,sum(provision) as provision
-                        from provinvoices
-                        group by
-                        age_range
-                        ) as T'
-                        ))
-                ->orderBy('tranch_priority')
-            )
             ->columns([
                 // ...
                 TextColumn::make('age_range')
@@ -103,6 +94,29 @@ class ProvisionSummary2 extends BaseWidget
                 TextColumn::make('perc_provision')
                     ->grow(false)
                     ->numeric(decimalPlaces: 3),
-            ]);
+                ]);
+    }
+
+    public function get_session_values(){
+
+        $queryse = session()->get('queryse');
+
+        $queryse = $queryse ? $queryse : '1<2';
+
+        return $queryse;
     }
 }
+
+/*
+Provinvoice::query()
+    ->select(DB::raw('
+        age_range
+        ,min(id) as id
+        ,count(*) as invoices
+        ,sum(actual_debt) as actual_debt
+        ,sum(provision) as provision
+        '
+        ))
+    ->groupBy('age_range')
+    ->orderBy('id','desc') //mandatory for allow laravel to execute the query
+*/

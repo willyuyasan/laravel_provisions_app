@@ -8,12 +8,17 @@ use App\Models\Provinvoice;
 use Illuminate\Support\Str;
 use Filament\Widgets\TableWidget;
 use Illuminate\Support\Facades\DB;
+use Filament\Tables\Grouping\Group;
 use Illuminate\Support\Facades\Log;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use App\Filament\Resources\ProvinvoiceResource\Pages\ListProvinvoices;
+
+//packages/widgets/resources/views/chart-widget.blade.php
 
 class ProvisionSummary extends TableWidget
 {
@@ -23,6 +28,10 @@ class ProvisionSummary extends TableWidget
     protected static ?string $pollingInterval = null;
 
     protected int | string | array $columnSpan = 'full';
+
+    // you have to modify blade (/app/vendor/filament/widgets/resources/views/table-widget.blade.php)
+    // you have to modify php (/app/vendor/filament/widgets/src/TableWidget.php)
+    protected static bool $collapsible = true; 
     
     public string $queryse;
 
@@ -38,6 +47,7 @@ class ProvisionSummary extends TableWidget
                 Provinvoice::query()
                 ->select(DB::raw("
                     *
+                    , 'ALL' as all
                     ,provision/actual_debt as perc_provision
 
                     ,case
@@ -81,7 +91,8 @@ class ProvisionSummary extends TableWidget
                         '91-120' => 'danger',
                         '121-180' => 'danger',
                         '180+' => 'danger',
-                    }),
+                    })
+                    ->visibleFrom('md'),
 
                 TextColumn::make('invoices')
                     ->grow(false)
@@ -110,9 +121,34 @@ class ProvisionSummary extends TableWidget
                 TextColumn::make('perc_provision')
                     ->grow(false)
                     ->numeric(decimalPlaces: 3),
-            ])
-            //->poll('3s')
-            ; 
+
+                
+                ])
+                ->filters([
+                    //
+                    SelectFilter::make('age_range')
+                    ->options(fn (): array => Provinvoice::query()->pluck('age_range','age_range')->all()),
+                ]);
+    }
+
+    public function updated($name)
+    {
+        if (Str::of($name)->contains(['tableFilters'])) {
+
+            $queryse = $this->pass_queryfilters();
+            $this->dispatch('updateProvisionSumary');
+        }
+    }
+
+    public function pass_queryfilters(){
+
+        $age_range = $this->table->getLivewire()->tableFilters['age_range']['value'];
+
+        //error_log($queryse);
+
+        session()->put('age_range', $age_range);
+
+        return $age_range;
     }
 }
 
