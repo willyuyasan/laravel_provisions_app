@@ -25,8 +25,9 @@ class StatsOverview extends BaseWidget
                 ->color('success')
                 ->extraAttributes([
                     'class' => 'cursor-pointer',
+                    //'wire:click' => 'goto()',
                 ])
-                ->url($prov_info['url_provisions_storage']),
+                ->url($prov_info['url_provisions_storage'], shouldOpenInNewTab: true),
                 //->url('//login.microsoftonline.com'),
 
             Stat::make('Maximo numero de dias estimado:', $end_curve_days),
@@ -60,6 +61,14 @@ class StatsOverview extends BaseWidget
         $debt = Provinvoice::query()->sum('actual_debt');
         $pp_prov = number_format(($prov/$debt)*100,2);
         return $pp_prov;
+    }
+
+    public function goto()
+    {
+        $prov_info = $this->provision_info();
+        //return redirect()->away($prov_info['url_provisions_storage']);
+        //return redirect()->to(GeoImageResource::getUrl(‘index’));
+        return Redirect::away($prov_info['url_provisions_storage']);
     }
 
     protected function getColumns(): int {
