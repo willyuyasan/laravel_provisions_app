@@ -8,8 +8,12 @@ use Filament\Tables\Table;
 use App\Models\Provinvoice;
 use Illuminate\Support\Str;
 use App\Models\ProvTranches;
+//use Filament\Widgets\TableWidget;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\DB;
+use Filament\Tables\Actions\Action;
+use Filament\Forms\Components\Livewire;
+use Filament\Forms\Form;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Filters\SelectFilter;
@@ -17,7 +21,8 @@ use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 FilamentColor::register([
     'danger2' => Color::hex('#b0347f'), //purple
@@ -97,30 +102,41 @@ class ProvisionSummary extends BaseWidget
 
                 SelectFilter::make('curve_segment')
                 ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
-
             ]);
-    }
 
-    public function resetTableFiltersForm(): void
-    {
-        error_log('resetTableFiltersForm');
-        $queryse = $this->pass_queryfilters();
-        $this->dispatch('updateProvisionSumary');
-    }
-
-    public function dehydrate(): void
-    {
-        error_log('dehydrate');
-        $queryse = $this->pass_queryfilters();
-        $this->dispatch('updateProvisionSumary');
     }
 
     public function updated(): void
     {
         error_log('updated');
         $queryse = $this->pass_queryfilters();
-        $this->dispatch('updateProvisionSumary');
+        
     }
+
+    public function resetTableFiltersForm(): void
+    {
+        error_log('resetTableFiltersForm');
+        $queryse = $this->pass_queryfilters();
+    }
+
+    public function removeTableFilters(): void
+    {
+        error_log('removeTableFilters');
+        $queryse = $this->pass_queryfilters();
+    }
+
+    public function isTableLoaded(): bool
+    {
+        error_log('loaded');
+        $queryse = $this->pass_queryfilters();
+        return True;
+    }
+
+    //public function removeTableFilter(string $filterName, ?string $field = null, bool $isRemovingAllFilters = false): void
+    //{
+    //    error_log($filterName);
+    //    $queryse = $this->pass_queryfilters();
+    //}
 
     public function pass_queryfilters(){
 
@@ -132,6 +148,8 @@ class ProvisionSummary extends BaseWidget
         $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;
 
         session()->put('queryse', $queryse);
+
+        $this->dispatch('updateProvisionSumary');
 
         return $queryse;
     }

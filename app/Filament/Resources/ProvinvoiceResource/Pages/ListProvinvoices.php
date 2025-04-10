@@ -13,7 +13,7 @@ use Filament\Pages\Concerns\ExposesTableToWidgets;
 class ListProvinvoices extends ListRecords
 {
     protected static string $resource = ProvinvoiceResource::class;
-    use ExposesTableToWidgets;
+    //use ExposesTableToWidgets;
 
     public $queryse;
     
@@ -26,15 +26,15 @@ class ListProvinvoices extends ListRecords
     }
 
     // For showing the widget into the resource
-    protected function getHeaderWidgets(): array
-    {
-        $queryse = $this->pass_queryfilters();
-        $this->dispatch('updateProvisionSumary');
-
-        return [
-            ProvisionSummary::class
-        ];
-    }
+    //protected function getHeaderWidgets(): array
+    //{
+    //    $queryse = $this->pass_queryfilters();
+    //    $this->dispatch('updateProvisionSumary');
+    //
+    //    return [
+    //        ProvisionSummary::class
+    //    ];
+    //}
 
     public function updated($name)
     {
@@ -51,7 +51,7 @@ class ListProvinvoices extends ListRecords
         $product = $this->table->getLivewire()->tableFilters['product']['value'];
         $curve_segment = $this->table->getLivewire()->tableFilters['curve_segment']['value'];
 
-        $queryse = 'where 1<2';
+        $queryse = '1<2';
         $queryse = $country_code ? "{$queryse} and country_code in ('{$country_code}')" : $queryse;
         $queryse = $product ? "{$queryse} and product in ('{$product}')" : $queryse;
         $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;

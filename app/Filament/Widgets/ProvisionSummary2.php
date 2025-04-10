@@ -6,6 +6,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use App\Models\Provinvoice;
 use App\Models\ProvTranches;
+use Filament\Widgets\TableWidget;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
@@ -20,7 +21,7 @@ FilamentColor::register([
     'danger2' => Color::hex('#b0347f'), //purple
 ]);
 
-class ProvisionSummary2 extends BaseWidget
+class ProvisionSummary2 extends TableWidget
 {
     protected static ?string $heading = 'Total Provision (Altura Mora)';
     protected static ?int $sort = 5;
