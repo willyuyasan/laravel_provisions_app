@@ -4,24 +4,29 @@ namespace App\Filament\Widgets;
 
 use Exception;
 use Filament\Tables;
+use Livewire\Component;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Provinvoice;
+//use Filament\Widgets\TableWidget;
 use Illuminate\Support\Str;
 use App\Models\ProvTranches;
-//use Filament\Widgets\TableWidget;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
+use Illuminate\Contracts\View\View;
 use Filament\Forms\Components\Livewire;
-use Filament\Forms\Form;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Support\Facades\FilamentColor;
+use Filament\Tables\Actions\Contracts\HasTable;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 FilamentColor::register([
@@ -29,13 +34,17 @@ FilamentColor::register([
 ]);
 
 class ProvisionSummary extends BaseWidget
+//class ProvisionSummary extends Component implements HasForms, HasTable
 {
+    use InteractsWithForms;
+    use InteractsWithTable;
+
     protected static ?string $heading = 'Total Provision (Productos)';
     protected static ?int $sort = 3;
 
     protected $listeners = ['updateProvisionSumary' => '$refresh'];
     protected static ?string $pollingInterval = null;
-    protected static bool $isLazy = false;
+    //protected static bool $isLazy = false;
     //public string $queryse;
 
     public function table(Table $table): Table
@@ -127,9 +136,10 @@ class ProvisionSummary extends BaseWidget
 
     public function isTableLoaded(): bool
     {
-        error_log('loaded');
-        $queryse = $this->pass_queryfilters();
+        error_log('isTableLoaded');
+
         return True;
+
     }
 
     //public function removeTableFilter(string $filterName, ?string $field = null, bool $isRemovingAllFilters = false): void
