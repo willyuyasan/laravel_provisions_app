@@ -91,8 +91,12 @@ class ProvisionSummary2 extends TableWidget
                         ->label('') 
                         ->numeric(decimalPlaces: 0)
                     ),
-                
+
                 TextColumn::make('perc_provision')
+                    ->getStateUsing(function(Model $record) {
+                        $pp_ap = number_format(($record->provision / $record->actual_debt)*100, 2);
+                        return $pp_ap;
+                    })
                     ->grow(false)
                     ->numeric(decimalPlaces: 3),
                 ]);

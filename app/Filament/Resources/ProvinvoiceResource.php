@@ -24,8 +24,9 @@ class ProvinvoiceResource extends Resource
     protected static ?string $model = Provinvoice::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Facturas Provisionadas';
+    protected static ?string $modelLabel = 'Facturas Provisionadas';
     
-
     public static function form(Form $form): Form
     {
         return $form

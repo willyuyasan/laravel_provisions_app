@@ -26,9 +26,12 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Actions\Contracts\HasTable;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use App\Traits\Myutils;
 
 FilamentColor::register([
     'danger2' => Color::hex('#b0347f'), //purple
@@ -39,6 +42,7 @@ class ProvisionSummary extends BaseWidget
 {
     use InteractsWithForms;
     use InteractsWithTable;
+    use MyUtils;
 
     protected static ?string $heading = 'Total Provision (Productos)';
     protected static ?int $sort = 3;
@@ -51,6 +55,7 @@ class ProvisionSummary extends BaseWidget
     public function table(Table $table): Table
     {
         $queryse = $this->get_session_values();
+        $prov_info = $this->provision_info();
         error_log($queryse);
 
         return $table
@@ -100,11 +105,16 @@ class ProvisionSummary extends BaseWidget
                 
                 TextColumn::make('perc_provision')
                     ->getStateUsing(function(Model $record) {
-                        return $record->provision / $record->actual_debt;
+                        $pp_ap = number_format(($record->provision / $record->actual_debt)*100, 2);
+                        return $pp_ap;
                     })
                     ->grow(false)
-                    ->numeric(decimalPlaces: 3),
-                    
+                    ->numeric(decimalPlaces: 3)
+                    ->summarize([
+                        Summarizer::make()
+                            ->using(fn () => $prov_info['pp_ap'])
+                            ->numeric(decimalPlaces: 3),
+                    ]),
             ])
             ->filters([
                 //
@@ -113,6 +123,9 @@ class ProvisionSummary extends BaseWidget
 
                 SelectFilter::make('curve_segment')
                 ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
+
+                SelectFilter::make('product')
+                ->options(fn (): array => Provinvoice::query()->pluck('product','product')->all()),
             ]);
     }
 
@@ -151,10 +164,12 @@ class ProvisionSummary extends BaseWidget
 
         $country_code = $this->table->getLivewire()->tableFilters['country_code']['value'];
         $curve_segment = $this->table->getLivewire()->tableFilters['curve_segment']['value'];
+        $product = $this->table->getLivewire()->tableFilters['product']['value'];
 
         $queryse = '1<2';
         $queryse = $country_code ? "{$queryse} and country_code in ('{$country_code}')" : $queryse;
         $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;
+        $queryse = $product ? "{$queryse} and product in ('{$product}')" : $queryse;
 
         session()->put('queryse', $queryse);
 

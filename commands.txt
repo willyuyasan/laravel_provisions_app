@@ -125,3 +125,6 @@ php artisan make:model ProcessInfo
 
 #Table widget into a resource
 php artisan make:filament-widget ProvisionSummary --table
+
+
+php artisan make:policy ProvinvoicePolicy --model=Provinvoice
