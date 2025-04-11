@@ -11,21 +11,22 @@ use App\Models\Provinvoice;
 //use Filament\Widgets\TableWidget;
 use Illuminate\Support\Str;
 use App\Models\ProvTranches;
+use Filament\Widgets\TableWidget;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\View\View;
-use Filament\Forms\Components\Livewire;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Livewire;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Support\Facades\FilamentColor;
-use Filament\Tables\Actions\Contracts\HasTable;
 use Filament\Tables\Columns\Summarizers\Sum;
-use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Tables\Actions\Contracts\HasTable;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
@@ -44,7 +45,7 @@ class ProvisionSummary extends BaseWidget
 
     protected $listeners = ['updateProvisionSumary' => '$refresh'];
     protected static ?string $pollingInterval = null;
-    //protected static bool $isLazy = false;
+    protected static bool $isLazy = false;
     //public string $queryse;
 
     public function table(Table $table): Table
@@ -53,6 +54,7 @@ class ProvisionSummary extends BaseWidget
         error_log($queryse);
 
         return $table
+            ->heading('Total Provision (Productos)')
             ->query(
                 Provinvoice::query()
                 ->select(DB::raw('
@@ -65,7 +67,7 @@ class ProvisionSummary extends BaseWidget
                     ))
                 ->groupBy('product')
                 ->orderBy('provision','desc') //mandatory for allow laravel to execute the query
-                ->whereRaw("{$queryse}")
+                //->whereRaw("{$queryse}")
             )
             ->columns([
                 // ...
@@ -112,13 +114,13 @@ class ProvisionSummary extends BaseWidget
                 SelectFilter::make('curve_segment')
                 ->options(fn (): array => Provinvoice::query()->pluck('curve_segment','curve_segment')->all()),
             ]);
-
     }
 
     public function updated(): void
     {
         error_log('updated');
         $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary2');
         
     }
 
@@ -126,27 +128,24 @@ class ProvisionSummary extends BaseWidget
     {
         error_log('resetTableFiltersForm');
         $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary2');
     }
 
     public function removeTableFilters(): void
     {
         error_log('removeTableFilters');
         $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary2');
     }
 
     public function isTableLoaded(): bool
     {
         error_log('isTableLoaded');
+        $queryse = $this->pass_queryfilters();
+        $this->dispatch('updateProvisionSumary2');
 
         return True;
-
     }
-
-    //public function removeTableFilter(string $filterName, ?string $field = null, bool $isRemovingAllFilters = false): void
-    //{
-    //    error_log($filterName);
-    //    $queryse = $this->pass_queryfilters();
-    //}
 
     public function pass_queryfilters(){
 
@@ -158,8 +157,6 @@ class ProvisionSummary extends BaseWidget
         $queryse = $curve_segment ? "{$queryse} and curve_segment in ('{$curve_segment}')" : $queryse;
 
         session()->put('queryse', $queryse);
-
-        $this->dispatch('updateProvisionSumary');
 
         return $queryse;
     }
@@ -173,5 +170,9 @@ class ProvisionSummary extends BaseWidget
         return $queryse;
     }
 
+    protected function getTableHeading(): string
+    {
+        return __('Translatable Custom Heading');
+    }
     
 }

@@ -26,7 +26,7 @@ class ProvisionSummary2 extends TableWidget
     protected static ?string $heading = 'Total Provision (Altura Mora)';
     protected static ?int $sort = 5;
 
-    protected $listeners = ['updateProvisionSumary' => '$refresh'];
+    protected $listeners = ['updateProvisionSumary2' => '$refresh'];
     protected static ?string $pollingInterval = null;
     public string $queryse;
 
