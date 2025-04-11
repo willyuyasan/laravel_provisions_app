@@ -104,16 +104,17 @@ class ProvisionSummary extends BaseWidget
                     ),
                 
                 TextColumn::make('perc_provision')
+                    ->label('% Provision')
                     ->getStateUsing(function(Model $record) {
-                        $pp_ap = number_format(($record->provision / $record->actual_debt)*100, 2);
+                        $pp_ap = number_format(($record->provision / $record->actual_debt)*100, 2).'%';
                         return $pp_ap;
                     })
                     ->grow(false)
-                    ->numeric(decimalPlaces: 3)
+                    ->numeric(decimalPlaces: 2)
                     ->summarize([
                         Summarizer::make()
-                            ->using(fn () => $prov_info['pp_ap'])
-                            ->numeric(decimalPlaces: 3),
+                            ->using(fn () => $prov_info['pp_ap'].'%')
+                            ->numeric(decimalPlaces: 2),
                     ]),
             ])
             ->filters([
